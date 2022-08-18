@@ -1,6 +1,6 @@
 {
     
-    "superheroes":[
+    "superHeroes":[
         {
             "id":1,
             "name":"Batman",
@@ -17,5 +17,34 @@
             "alterEgo": "Pricess Diana"
         }
     
+    ],
+    "xmen":[
+        {
+            "id":1,
+            "name":"Wolverine",
+            "alterEgo":"James Howlett (Logan)"
+        },
+        {
+            "id":2,
+            "name":"Ciclope",
+            "alterEgo": "Scott Summers"
+        },
+        {
+            "id":3,
+            "name":"Beast",
+            "alterEgo":"Henry McCoy"
+        }
+    ],
+    "users":[
+        {
+            "id":"rene@example.com",
+            "channelId": "renewedformer"
+        }
+    ],
+    "channels":[
+        {
+            "id": "renewedformer",
+            "clients": ["client1", "client2", "client3"]
+        }
     ]
 }

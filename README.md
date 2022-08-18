@@ -1,70 +1,229 @@
-# Getting Started with Create React App
+# React query
+`npm i react-query`
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+`import {useQuery} from 'react-query'` 
 
-## Available Scripts
 
-In the project directory, you can run:
+## uso
 
-### `npm start`
+ - No Hook
+```js
+export function useCharacters() {
+  const getAllChars = useCallback(async () => {
+      const response = await getCharacters();
+      const data = response.json();
+      return data
+   
+  }, []);
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+  const {data, status} = useQuery('apiData', getAllChars)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+  const value = useMemo(
+    () => ({
+      data,
+      status
+    }),
+    [data, status]
+  );
 
-### `npm test`
+  return value;
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+}
+```
 
-### `npm run build`
+- no Componente
+```js
+import { useCharacters } from "./useCharacters";
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+export default function Characters() {
+  const {data, status } = useCharacters();
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  return <div>
+  {status === 'loading' && <div>Loading...</div>}
+  {status === 'error' && <div>Error</div>}
+  {status === 'success' && data?.results?.map((character)=><p key={character.id}>{character.name}</p>)}
+  </div>;
+}
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+- Colocar o QueryClientProvider
+```js
+import "./App.css";
+import Characters from "./Characters/Characters";
+import {QueryClientProvider, QueryClient} from 'react-query'
 
-### `npm run eject`
+const queryClient = new QueryClient()
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+function App() {
+  return (
+    <div className="App">
+      
+      <div className="container">
+        <h1>React Query Tutorial - Rick and Morty</h1>
+      <QueryClientProvider client={queryClient}>
+        <Characters />
+      </QueryClientProvider>
+      </div>
+        
+    </div>
+  );
+}
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+export default App;
+```
+## Colocando o ReactQueryTools no site
+```js
+import './App.css';
+import {Router} from './routes/router';
+import {QueryClient, QueryClientProvider} from 'react-query'
+import {ReactQueryDevtools} from 'react-query/devtools'
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+const queryClient = new QueryClient()
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <div className="App">
+        <Router/>
+      </div>
+      <ReactQueryDevtools initialIsOpen={false} position='bottom-right'/>
+    </QueryClientProvider>
+  );
+}
 
-## Learn More
+export default App;
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
 
-### Code Splitting
+## React Query Hooks
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### useQuery
+Usado para requisições http/s, para chamadas de APIs
+Já devolve o resultado, e os estados da api, não é necessário criar um useState para armazenar os resultados
+recebe 2(3 opcional) parametros, o primeiro é a chave da consulta e o segundo é a função que de fato chama o endpoint
+```js
+...
+  const {data, status} = useQuery('apiData', getAllChars)
+...
+```
+no caso `apiData` é a chave e getAllChars é a função que faz a chamada para a api
 
-### Analyzing the Bundle Size
+  - passando paginação, basta passar `queryKey` pra a função que fará a chamada e como passado no `useQuery` a paginação é o segundo parametro, portanto `queryKey[1]` 
+    ```js
+    const [page, setPage] = useState(1)
+    ...
+     const getAllChars = useCallback(async ({queryKey}) => {
+      const response = await getCharacters(queryKey[1]);
+      const data = response.json();
+      return data
+   
+  }, []);
+    ...
+    const {data, status} = useQuery(['apiData', page], getAllChars)
+    ...
+    ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+    **ou**
 
-### Making a Progressive Web App
+    ```js
+    const [page, setPage] = useState(1)
+    ...
+     const getAllChars = useCallback(async (page) => {
+      const response = await getCharacters(page);
+      const data = response.json();
+      return data
+   
+  }, []);
+    ...
+    const {data, status} = useQuery(['apiData', page], ()=>getAllChars(page))
+    ...
+    ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-### Advanced Configuration
+ - Persistir a ultima busca até que seja completada a chamada
+    Neste caso passamos o 3 parametro que são outras opções, e passamos ` keepPreviousData: true`, para que mantenha renderizado na tela a ultima consulta até que a nova possa subistitui-loading
+    
+    ```js
+    const [page, setPage] = useState(1)
+    ...
+     const getAllChars = useCallback(async ({queryKey}) => {
+      const response = await getCharacters(queryKey[1]);
+      const data = response.json();
+      return data
+   
+  }, []);
+    ...
+    const {data, status, isPreviousData} = useQuery(['apiData', page], getAllChars, , { keepPreviousData: true}))
+    ...
+    ```
+  #### useQuery 3º parametro
+    pode ser um objeto com os valores:
+    `keepPreviousData: boolean` - mantem a ultima chamada em cache?
+    `cacheTime: number (milisseconds)` - seta o tempo de duração do cache após useQuery ficar inativo(exemplo, quando navega para uma página que não use a query), após este tempo o cache e limpo.
+    `staleTime: number (milisseconds)` - seta o tempo para que quando a mesma requisição for chamada, não refaça ela em 30 segundos, ou seja se um edponit não muda seus resultados com freqência, seria interessante pegar do cache ao ivés de fazer uma nova chamada  
+    `refetchOnMount: boolean | 'always'` - ao montar o componente busca dados do endpoint
+    `refetchOnWindowFocus: boolean | 'always'` - por paadrão é always. Quando foca na tela novamente, ou seja, saiu de uma aba e volta nela por exemplo
+    `refreshInterval: false | number (milisseconds)` - para fazer pooling em um endpoint a cada X tempos, desde que a tela esteja em foco
+    `refreshIntervalInBackground: boolean` -  trabalha em conjunto com o 'refreshInterval', mas funciona para quando a aplicação não está em foco, ou seja o cliente esta em outra aba por exemplo.
+    `enabled: boolean` - por padrão é true, quando montar o componente já executa a query
+    deve ser usado em conjunto com a função `refetch` importada de useQuery:
+    ```js
+     const {data:res, isLoading, error, refetch} = useQuery('superHeroes', getSuperHeroes, {enabled:false})
+    ```
+     e chamar esta função um click de um botão por exemplo.
+    `onSuccess: function(param: object)`: passa um callback para quando a query é executada com sucesso, caso queira recebe algo ra resposta no callback basta passar o parametro de retorno com o nome desejado, normalmente `data`
+    `onError: function(param: object)`: passa um callback para quando a query retornar um erro, caso queira recebe algo ra resposta no callback basta passar o parametro de retorno com o nome desejado, normalmente `error`
+    `select: function(param :object)`: um callback para transformar a resposta vinda da api para outra coisa
+    `initialData: function()`: um callback para passar os dados iniciais ou pegar de outra query, usando o `useQueryClient`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+  #### useQuery status
+    Podem ser 
+    - `isLoading`: Esta executando a chamada da api pela primeira vez quando o cache esta vazio
+    - `isFetching`: Esta executando a chamada da api em background para atualizar a consulta
+  
+  #### Dependant queries
+  Quando uma query depende do resultado da outra para ser chamada, neste caso a query dependente deve ser habilitada somente quando tiver o necessário, no caso abaixo chamamos a query para pegar os 'channels' somente quanto tivermos o 'channelId' que esta ma resposta da primeira requisição feira para pegar os 'users'
 
-### Deployment
+  ```js
+  const id = 'algumId'
+  const{ data:resUser } = useQuery(['user', id], ()=>getUserById(id), {})
+  ...
+  const channelId = resUser?.data?.channelId
+  const{ data:resChannel } = useQuery(['channel', channelId], ()=>getChannelById(channelId), { enabled: !!channelId})
+  ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### useQueries (parallel queryies)
+para realizar mais de uma query simultânea, mas o principio é o mesmo do `useQuery`
 
-### `npm run build` fails to minify
+```js
+ const useParralelSuperHeroQuery = (ids)=>
+    useQueries(
+        ids?.map((id)=>({
+            queryKey: ['super-hero', id],
+            queryFn: ()=> getSuperHeroById(id)
+        }))
+    )
+```
+o resultado será um array de queries com os mesmo parametros do resultado de um `useQuery` simples
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### useQueryClient - exemplo de initialData
+Usado por exemplo para pegar os dados de cahce de outra query, no exemplo abaixo, a segunda query chama o resultado em cache da  primeira para passar como dado inicial
+
+```js
+useQuery('superHeroes', getSuperHeroes, {
+    refetchOnWindowFocus:false,
+    onSuccess,
+    onError,
+    
+})
+...
+
+useQuery(['superHeroeDetails', id], ()=>getSuperHeroById(id), {
+    refetchOnWindowFocus:false,
+    initialData: ()=>{
+        const hero = queryClient.getQueryData('superHeroes')?.data.find((hero)=>hero.id === parseInt(id))
+        return hero ? {data:hero} : undefined
+    }
+})
+```

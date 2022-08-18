@@ -1,6 +1,6 @@
-.App {
+/* .App {
   text-align: center;
-}
+} */
 
 .App-logo {
   height: 40vmin;
@@ -21,13 +21,13 @@ nav ul li {
   position: relative;
 }
 
-nav ul li>ul{
+nav li>ul{
   display: none;
   position: absolute;
   top:100% ;
   left: 0;
 }
-nav ul li:hover>ul{
+nav li:hover>ul{
   display: flex ;
 }
 
@@ -50,6 +50,10 @@ nav ul li:hover>ul{
 
 .App-link {
   color: #61dafb;
+}
+
+.main_content{
+  padding: 15px;
 }
 
 @keyframes App-logo-spin {

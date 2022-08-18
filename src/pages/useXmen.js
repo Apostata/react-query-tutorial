@@ -1,7 +1,7 @@
 import {  useMemo } from "react"
-import { useSuperHeroesQuery } from "../hooks/SuperHeroesQuerys"
+import { useXmenQuery } from "../hooks/XmenQuerys"
 //Este é um exmplo da página usando react-query
-export const useSuperHeroes = ()=>{
+export const useXmen = ()=>{
 
     const onSuccess = (data)=>{
         console.log('success callback', data)
@@ -12,11 +12,11 @@ export const useSuperHeroes = ()=>{
     }
 
 
-    const {data:res, isLoading, error} = useSuperHeroesQuery(onSuccess, onError)
+    const {data:res, isLoading, error} = useXmenQuery(onSuccess, onError)
     const value = useMemo(()=> ({
-        superHeroes: res?.data,
-        loadingSuperHeroes: isLoading, 
-        errorSuperHeroes:error?.message,
+        xmen: res?.data,
+        loadingXmen: isLoading, 
+        errorXmen:error?.message,
     }),[res, isLoading, error])
 
     return value;
