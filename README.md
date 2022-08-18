@@ -4,95 +4,96 @@
 `import {useQuery} from 'react-query'` 
 
 
-## uso
+## Exemplo de uso
 
  - No Hook
-```js
-export function useCharacters() {
-  const getAllChars = useCallback(async () => {
-      const response = await getCharacters();
-      const data = response.json();
-      return data
-   
-  }, []);
+  ```js
+    export function useCharacters() {
+      const getAllChars = useCallback(async () => {
+          const response = await getCharacters();
+          const data = response.json();
+          return data
+      
+      }, []);
 
-  const {data, status} = useQuery('apiData', getAllChars)
+      const {data, status} = useQuery('apiData', getAllChars)
 
-  const value = useMemo(
-    () => ({
-      data,
-      status
-    }),
-    [data, status]
-  );
+      const value = useMemo(
+        () => ({
+          data,
+          status
+        }),
+        [data, status]
+      );
 
-  return value;
+      return value;
 
-}
-```
+    }
+  ```
 
 - no Componente
-```js
-import { useCharacters } from "./useCharacters";
+  
+  ```js
+    import { useCharacters } from "./useCharacters";
 
-export default function Characters() {
-  const {data, status } = useCharacters();
+    export default function Characters() {
+      const {data, status } = useCharacters();
 
-  return <div>
-  {status === 'loading' && <div>Loading...</div>}
-  {status === 'error' && <div>Error</div>}
-  {status === 'success' && data?.results?.map((character)=><p key={character.id}>{character.name}</p>)}
-  </div>;
-}
-
-```
+      return <div>
+      {status === 'loading' && <div>Loading...</div>}
+      {status === 'error' && <div>Error</div>}
+      {status === 'success' && data?.results?.map((character)=><p key={character.id}>{character.name}</p>)}
+      </div>;
+    }
+  ```
 - Colocar o QueryClientProvider
-```js
-import "./App.css";
-import Characters from "./Characters/Characters";
-import {QueryClientProvider, QueryClient} from 'react-query'
 
-const queryClient = new QueryClient()
+  ```js
+    import "./App.css";
+    import Characters from "./Characters/Characters";
+    import {QueryClientProvider, QueryClient} from 'react-query'
 
-function App() {
-  return (
-    <div className="App">
-      
-      <div className="container">
-        <h1>React Query Tutorial - Rick and Morty</h1>
-      <QueryClientProvider client={queryClient}>
-        <Characters />
-      </QueryClientProvider>
-      </div>
-        
-    </div>
-  );
-}
+    const queryClient = new QueryClient()
 
-export default App;
-```
+    function App() {
+      return (
+        <div className="App">
+          
+          <div className="container">
+            <h1>React Query Tutorial - Rick and Morty</h1>
+          <QueryClientProvider client={queryClient}>
+            <Characters />
+          </QueryClientProvider>
+          </div>
+            
+        </div>
+      );
+    }
+
+    export default App;
+  ```
 ## Colocando o ReactQueryTools no site
+
 ```js
-import './App.css';
-import {Router} from './routes/router';
-import {QueryClient, QueryClientProvider} from 'react-query'
-import {ReactQueryDevtools} from 'react-query/devtools'
+  import './App.css';
+  import {Router} from './routes/router';
+  import {QueryClient, QueryClientProvider} from 'react-query'
+  import {ReactQueryDevtools} from 'react-query/devtools'
 
-const queryClient = new QueryClient()
+  const queryClient = new QueryClient()
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <div className="App">
-        <Router/>
-      </div>
-      <ReactQueryDevtools initialIsOpen={false} position='bottom-right'/>
-    </QueryClientProvider>
-  );
-}
+  function App() {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <div className="App">
+          <Router/>
+        </div>
+        <ReactQueryDevtools initialIsOpen={false} position='bottom-right'/>
+      </QueryClientProvider>
+    );
+  }
 
-export default App;
-
+  export default App;
 
 ```
 
@@ -103,48 +104,48 @@ Usado para requisições http/s, para chamadas de APIs
 Já devolve o resultado, e os estados da api, não é necessário criar um useState para armazenar os resultados
 recebe 2(3 opcional) parametros, o primeiro é a chave da consulta e o segundo é a função que de fato chama o endpoint
 ```js
-...
-  const {data, status} = useQuery('apiData', getAllChars)
-...
+  ...
+    const {data, status} = useQuery('apiData', getAllChars)
+  ...
 ```
 no caso `apiData` é a chave e getAllChars é a função que faz a chamada para a api
 
   - passando paginação, basta passar `queryKey` pra a função que fará a chamada e como passado no `useQuery` a paginação é o segundo parametro, portanto `queryKey[1]` 
     ```js
-    const [page, setPage] = useState(1)
-    ...
-     const getAllChars = useCallback(async ({queryKey}) => {
-      const response = await getCharacters(queryKey[1]);
-      const data = response.json();
-      return data
-   
-  }, []);
-    ...
-    const {data, status} = useQuery(['apiData', page], getAllChars)
-    ...
+      const [page, setPage] = useState(1)
+      ...
+      const getAllChars = useCallback(async ({queryKey}) => {
+        const response = await getCharacters(queryKey[1]);
+        const data = response.json();
+        return data
+    
+      }, []);
+      ...
+      const {data, status} = useQuery(['apiData', page], getAllChars)
+      ...
     ```
 
     **ou**
 
     ```js
-    const [page, setPage] = useState(1)
-    ...
-     const getAllChars = useCallback(async (page) => {
-      const response = await getCharacters(page);
-      const data = response.json();
-      return data
-   
-  }, []);
-    ...
-    const {data, status} = useQuery(['apiData', page], ()=>getAllChars(page))
-    ...
+      const [page, setPage] = useState(1)
+      ...
+      const getAllChars = useCallback(async (page) => {
+        const response = await getCharacters(page);
+        const data = response.json();
+        return data
+    
+      }, []);
+      ...
+      const {data, status} = useQuery(['apiData', page], ()=>getAllChars(page))
+      ...
     ```
 
 
  - Persistir a ultima busca até que seja completada a chamada
     Neste caso passamos o 3 parametro que são outras opções, e passamos ` keepPreviousData: true`, para que mantenha renderizado na tela a ultima consulta até que a nova possa subistitui-loading
     
-    ```js
+  ```js
     const [page, setPage] = useState(1)
     ...
      const getAllChars = useCallback(async ({queryKey}) => {
@@ -152,11 +153,11 @@ no caso `apiData` é a chave e getAllChars é a função que faz a chamada para 
       const data = response.json();
       return data
    
-  }, []);
+    }, []);
     ...
     const {data, status, isPreviousData} = useQuery(['apiData', page], getAllChars, , { keepPreviousData: true}))
     ...
-    ```
+  ```
   #### useQuery 3º parametro
     pode ser um objeto com os valores:
     `keepPreviousData: boolean` - mantem a ultima chamada em cache?
