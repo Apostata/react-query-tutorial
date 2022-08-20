@@ -1,5 +1,5 @@
-import { getSuperHeroById, getSuperHeroes } from '../services/superHeroes.service'
-import {useQuery, useQueries, useQueryClient} from 'react-query'
+import { getSuperHeroById, getSuperHeroes, postSuperHero } from '../services/superHeroes.service'
+import {useQuery, useQueries, useQueryClient, useMutation} from 'react-query'
 
 export const useSuperHeroDetailsQuery = (id)=>{
     const queryClient = useQueryClient()
@@ -12,14 +12,14 @@ export const useSuperHeroDetailsQuery = (id)=>{
     })
 }
 
-export const useSuperHeroesQuery = (onSuccess, onError)=>{
-    return useQuery('superHeroes', getSuperHeroes, {
+export const useSuperHeroesQuery = (onSuccess, onError)=>
+     useQuery('superHeroes', getSuperHeroes, {
         refetchOnWindowFocus:false,
         onSuccess,
         onError,
         
     })
-}
+
 
 export const useParralelSuperHeroQuery = (ids)=>
     useQueries(
@@ -28,3 +28,12 @@ export const useParralelSuperHeroQuery = (ids)=>
             queryFn: ()=> getSuperHeroById(id)
         }))
     )
+
+export const useSuperHeroAddMutation = (onMutateCallback, onErrorCallback, onSettledCallback) =>{
+    const queryClient = useQueryClient()
+    return useMutation(postSuperHero, {
+        onMutate:(newHero)=>onMutateCallback(queryClient, newHero),
+        onerror:(error, hero, context)=>onErrorCallback(queryClient, error, hero, context),
+        onSettled:()=>onSettledCallback(queryClient)
+    })
+}

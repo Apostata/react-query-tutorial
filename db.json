@@ -1,50 +1,89 @@
 {
-    
-    "superHeroes":[
-        {
-            "id":1,
-            "name":"Batman",
-            "alterEgo": "Bruce Wayne"
-        },
-        {
-            "id":2,
-            "name":"Superman",
-            "alterEgo": "Clark Kent"
-        },
-        {
-            "id":3,
-            "name":"Wonder Woman",
-            "alterEgo": "Pricess Diana"
-        }
-    
-    ],
-    "xmen":[
-        {
-            "id":1,
-            "name":"Wolverine",
-            "alterEgo":"James Howlett (Logan)"
-        },
-        {
-            "id":2,
-            "name":"Ciclope",
-            "alterEgo": "Scott Summers"
-        },
-        {
-            "id":3,
-            "name":"Beast",
-            "alterEgo":"Henry McCoy"
-        }
-    ],
-    "users":[
-        {
-            "id":"rene@example.com",
-            "channelId": "renewedformer"
-        }
-    ],
-    "channels":[
-        {
-            "id": "renewedformer",
-            "clients": ["client1", "client2", "client3"]
-        }
-    ]
+  "superHeroes": [
+    {
+      "id": 1,
+      "name": "Batman",
+      "alterEgo": "Bruce Wayne"
+    },
+    {
+      "id": 2,
+      "name": "Superman",
+      "alterEgo": "Clark Kent"
+    },
+    {
+      "id": 3,
+      "name": "Wonder Woman",
+      "alterEgo": "Pricess Diana"
+    },
+    {
+      "name": "The Flash",
+      "alterEgo": "Barry Allen",
+      "id": 4
+    },
+    {
+      "name": "Aquaman",
+      "alterEgo": "Arthur Curry",
+      "id": 5
+    },
+    {
+      "name": "Aquaman2",
+      "alterEgo": "Arthur Curry",
+      "id": 6
+    },
+    {
+      "name": "teste",
+      "alterEgo": "testest",
+      "id": 7
+    }
+  ],
+  "colors": [
+    {
+      "id": 1,
+      "name": "Red"
+    },
+    {
+      "id": 2,
+      "name": "Blue"
+    },
+    {
+      "id": 3,
+      "name": "yellow"
+    },
+    {
+      "id": 4,
+      "name": "purple"
+    },
+    {
+      "id": 5,
+      "name": "orange"
+    },
+    {
+      "id": 6,
+      "name": "green"
+    },
+    {
+      "id": 7,
+      "name": "black"
+    },
+    {
+      "id": 8,
+      "name": "white"
+    }
+  ],
+  "users": [
+    {
+      "id": "rene@example.com",
+      "channelId": "renewedformer"
+    }
+  ],
+  "channels": [
+    {
+      "id": "renewedformer",
+      "clients": [
+        "client1",
+        "client2",
+        "client3"
+      ]
+    }
+  ]
 }
